@@ -147,7 +147,7 @@ int ch;
 
 refresh()
 {
-	register i, j, line;
+	register i, j, line, k;
 	short old_row, old_col, first_row;
 
 	if (screen_dirty) {
@@ -158,7 +158,15 @@ refresh()
 		printf("\n");
 		for (i = 0; i < DROWS; i++) {
 			line = (first_row + i) % DROWS;
-			printf("%.*s\n", DCOLS, buffer[i]);
+			printf("[");
+			for (k = 0; k < DCOLS; k++) {
+				if (k != 0) {
+					printf("");
+				}
+				printf("%c", buffer[i][k]);
+			}
+			printf("]\n");
+			//printf("%.*s\n", DCOLS, buffer[i]);
 			if (lines_dirty[line]) {
 				for (j = 0; j < DCOLS; j++) {
 					if (buffer[line][j] != terminal[line][j]) {
