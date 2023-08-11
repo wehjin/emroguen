@@ -14,6 +14,7 @@ CFLAGS	:= \
 	-Wno-implicit-int\
 	-Wno-return-type\
 	-Wno-implicit-function-declaration\
+	-w\
 	-c -DUNIX -DUNIX_SYS5 -DCURSES
 
 LDFLAGS := \
@@ -48,7 +49,7 @@ clean:
 	@$(RM) -rv $(DIST_DIR) $(OBJ_DIR)
 
 .PHONY: run
-run:
+run: $(HTML)
 	emrun --no_browser $(HTML)
 
 -include $(OBJ:.o=.d)

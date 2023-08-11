@@ -84,8 +84,34 @@ char *SE = "";
 
 short cur_row, cur_col;
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+
+EM_JS(void, init_rogue_screen, (int rows, int cols), {
+	let grid = new Array(rows);
+	for (let i=0; i< grid.length; i++) {
+		grid[i] = new Array(cols).fill(32);
+	}
+	Module.rogue_screen = grid;
+	Module.print_rogue_screen = function () {
+		let grid_strings = new Array(grid.length);
+		for (let i=0; i<grid.length; i++) {
+			let row = String.fromCharCode(...grid[i]);
+			grid_strings[i] = row;
+		}
+		console.log(grid_strings.join('\n'));
+	};
+});
+EM_JS(void, set_rogue_screen, (int row, int col, int ch), {
+	Module.rogue_screen[row][col] = ch;
+});
+#endif
+
 initscr()
 {
+#ifdef EMSCRIPTEN
+	init_rogue_screen(DROWS, DCOLS);
+#endif
 	get_term_info();
 	clear();
 	printf("%s%s", TI, VS);
@@ -292,6 +318,10 @@ register row, col, ch;
 put_cursor(row, col)
 register row, col;
 {
+#ifdef EMSCRIPTEN
+	cur_row = row;
+	cur_col = col;
+#else
 	register i, rdif, cdif;
 	short ch, t;
 
@@ -311,7 +341,7 @@ register row, col;
 	}
 	if (row == cur_row) {
 		if (cdif <= 6) {
-		for (i = 0; i < cdif; i++) {
+			for (i = 0; i < cdif; i++) {
 				ch = (col < cur_col) ? BS :
 						terminal[row][cur_col + i];
 				put_st_char((int) ch);
@@ -341,6 +371,7 @@ register row, col;
 	} else {
 		printf("%s%d%s%d%s", cm_esc, row, cm_sep, col, cm_end);
 	}
+#endif
 }
 
 put_st_char(ch)
@@ -348,16 +379,26 @@ register ch;
 {
 	if ((ch & ST_MASK) && (!term_stand_out)) {
 		ch &= ~ST_MASK;
+#ifdef EMSCRIPTEN
+		set_rogue_screen(cur_row, cur_col, ch);
+#else
 		printf("%s%c", SO, ch);
+#endif
 		term_stand_out = 1;
 	} else if ((!(ch & ST_MASK)) && term_stand_out) {
+#ifdef EMSCRIPTEN
+		set_rogue_screen(cur_row, cur_col, ch);
+#else
 		printf("%s%c", SE, ch);
+#endif
 		term_stand_out = 0;
 	} else {
 		ch &= ~ST_MASK;
-/*
+#ifdef EMSCRIPTEN
+		set_rogue_screen(cur_row, cur_col, ch);
+#else
 		putchar(ch);
-*/
+#endif
 	}
 }
 
