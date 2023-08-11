@@ -39,21 +39,15 @@ boolean intrpt;
 	cant_int = 1;
 
 	if (!msg_cleared) {
-		printf("%s\n", MORE); 
-		/*
 		mvaddstr(MIN_ROW-1, msg_col, MORE);
 		refresh();
-		*/
 		wait_for_ack();
 		check_message();
 	}
 	(void) strcpy(msg_line, msg);
-	printf("%s\n", msg_line);
-/*
 	mvaddstr(MIN_ROW-1, 0, msg);
 	addch(' ');
 	refresh();
-*/
 	msg_cleared = 0;
 	msg_col = strlen(msg);
 
@@ -76,12 +70,9 @@ check_message()
 	if (msg_cleared) {
 		return;
 	}
-	printf("\n");
-/*
 	move(MIN_ROW-1, 0);
 	clrtoeol();
 	refresh();
-*/
 	msg_cleared = 1;
 }
 
@@ -144,7 +135,8 @@ boolean do_echo;
 }
 #include <emscripten.h>
 EM_ASYNC_JS(int, do_getchar, (), {
-const readKey = () => new Promise(resolve => window.addEventListener('keypress', resolve, { once: true }));
+	Module.print_rogue_screen();
+	const readKey = () => new Promise(resolve => window.addEventListener('keypress', resolve, { once: true }));
 	const x = await readKey();
 	return x.which;
 });

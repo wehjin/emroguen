@@ -101,20 +101,29 @@ EM_JS(void, init_rogue_screen, (int rows, int cols), {
 		}
 		console.log(grid_strings.join('\n'));
 	};
+	Module.clear_rogue_screen = function () {
+		for (let i=0; i<grid.length; i++) {
+			grid[i].fill(32);
+		}
+	}
 });
 EM_JS(void, set_rogue_screen, (int row, int col, int ch), {
 	Module.rogue_screen[row][col] = ch;
 });
 #endif
+EM_JS(void, clear_rogue_screen, (), {
+	Module.clear_rogue_screen();	
+});
 
 initscr()
 {
 #ifdef EMSCRIPTEN
 	init_rogue_screen(DROWS, DCOLS);
-#endif
+#else
 	get_term_info();
 	clear();
 	printf("%s%s", TI, VS);
+#endif
 }
 
 endwin()
@@ -181,18 +190,8 @@ refresh()
 		old_row = curscr->_cury;
 		old_col = curscr->_curx;
 		first_row = cur_row;
-		printf("\n");
 		for (i = 0; i < DROWS; i++) {
 			line = (first_row + i) % DROWS;
-			printf("[");
-			for (k = 0; k < DCOLS; k++) {
-				if (k != 0) {
-					printf("");
-				}
-				printf("%c", buffer[i][k]);
-			}
-			printf("]\n");
-			//printf("%.*s\n", DCOLS, buffer[i]);
 			if (lines_dirty[line]) {
 				for (j = 0; j < DCOLS; j++) {
 					if (buffer[line][j] != terminal[line][j]) {
@@ -205,7 +204,9 @@ refresh()
 
 		put_cursor(old_row, old_col);
 		screen_dirty = 0;
+#ifndef EMSCRIPTEN
 		fflush(stdout);
+#endif
 	}
 }
 
@@ -234,7 +235,9 @@ WINDOW *scr;
 		}
 	}
 	put_cursor(curscr->_cury, curscr->_curx);
+#ifndef EMSCRIPTEN
 	fflush(stdout);
+#endif
 	scr = scr;		/* make lint happy */
 }
 
@@ -247,8 +250,12 @@ short row, col;
 
 clear()
 {
+#ifdef EMSCRIPTEN
+	clear_rogue_screen();
+#else
 	printf("%s", CL);
 	fflush(stdout);
+#endif
 	cur_row = cur_col = 0;
 	move(0, 0);
 	clear_buffers();
@@ -635,7 +642,9 @@ tstp()
 	md_tstp();
 
 	start_window();
+#ifndef EMSCRIPTEN
 	printf("%s%s", TI, VS);
+#endif
 	wrefresh(curscr);
 	md_slurp();
 }

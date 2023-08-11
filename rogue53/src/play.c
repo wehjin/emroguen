@@ -28,7 +28,6 @@ play_level()
 	int count;
 
 	for (;;) {
-		printf("play loop\n");
 		interrupted = 0;
 		if (hit_message[0]) {
 			message(hit_message, 1);
