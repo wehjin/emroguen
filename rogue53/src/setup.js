@@ -1,3 +1,37 @@
+/*
+ * output methods 
+ */
+Module.rogue_screen = null;
+Module.init_rogue_screen = function (rows, cols) {
+	let grid = new Array(rows);
+	for (let i=0; i< grid.length; i++) {
+		grid[i] = new Array(cols).fill(32);
+	}
+	this.rogue_screen = grid;
+};
+Module.print_rogue_screen = function () {
+	const grid = this.rogue_screen;
+	let grid_strings = new Array(grid.length);
+	for (let i=0; i<grid.length; i++) {
+		let row = String.fromCharCode(...grid[i]);
+		grid_strings[i] = row;
+	}
+	console.log(grid_strings.join('\n'));
+};
+Module.clear_rogue_screen = function () {
+	const grid = this.rogue_screen;
+	for (let i=0; i<grid.length; i++) {
+		grid[i].fill(32);
+	}
+};
+Module.setchar = function (row, col, ch) {
+	const grid = this.rogue_screen;
+	grid[row][col] = ch;
+};
+
+/*
+ * input methods
+ */
 Module.char_codes = new Array();
 Module.resolve_ch = null;;
 Module.new_message = function (ch) {

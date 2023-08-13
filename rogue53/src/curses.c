@@ -88,27 +88,10 @@ short cur_row, cur_col;
 #include <emscripten.h>
 
 EM_JS(void, init_rogue_screen, (int rows, int cols), {
-	let grid = new Array(rows);
-	for (let i=0; i< grid.length; i++) {
-		grid[i] = new Array(cols).fill(32);
-	}
-	Module.rogue_screen = grid;
-	Module.print_rogue_screen = function () {
-		let grid_strings = new Array(grid.length);
-		for (let i=0; i<grid.length; i++) {
-			let row = String.fromCharCode(...grid[i]);
-			grid_strings[i] = row;
-		}
-		console.log(grid_strings.join('\n'));
-	};
-	Module.clear_rogue_screen = function () {
-		for (let i=0; i<grid.length; i++) {
-			grid[i].fill(32);
-		}
-	}
+	Module.init_rogue_screen(rows, cols);
 });
 EM_JS(void, set_rogue_screen, (int row, int col, int ch), {
-	Module.rogue_screen[row][col] = ch;
+	Module.setchar(row, col, ch);
 });
 #endif
 EM_JS(void, clear_rogue_screen, (), {

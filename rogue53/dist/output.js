@@ -201,7 +201,41 @@ Module['FS_createPath']("/usr", "games", true, true);
     // it.
     if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  Module.char_codes = new Array();
+  /*
+ * output methods 
+ */
+Module.rogue_screen = null;
+Module.init_rogue_screen = function (rows, cols) {
+	let grid = new Array(rows);
+	for (let i=0; i< grid.length; i++) {
+		grid[i] = new Array(cols).fill(32);
+	}
+	this.rogue_screen = grid;
+};
+Module.print_rogue_screen = function () {
+	const grid = this.rogue_screen;
+	let grid_strings = new Array(grid.length);
+	for (let i=0; i<grid.length; i++) {
+		let row = String.fromCharCode(...grid[i]);
+		grid_strings[i] = row;
+	}
+	console.log(grid_strings.join('\n'));
+};
+Module.clear_rogue_screen = function () {
+	const grid = this.rogue_screen;
+	for (let i=0; i<grid.length; i++) {
+		grid[i].fill(32);
+	}
+};
+Module.setchar = function (row, col, ch) {
+	const grid = this.rogue_screen;
+	grid[row][col] = ch;
+};
+
+/*
+ * input methods
+ */
+Module.char_codes = new Array();
 Module.resolve_ch = null;;
 Module.new_message = function (ch) {
 	if (typeof ch != "number") {
@@ -1267,8 +1301,8 @@ function dbg(text) {
 // end include: runtime_debug.js
 // === Body ===
 
-function init_rogue_screen(rows,cols) { let grid = new Array(rows); for (let i=0; i< grid.length; i++) { grid[i] = new Array(cols).fill(32); } Module.rogue_screen = grid; Module.print_rogue_screen = function () { let grid_strings = new Array(grid.length); for (let i=0; i<grid.length; i++) { let row = String.fromCharCode(...grid[i]); grid_strings[i] = row; } console.log(grid_strings.join('\n')); }; Module.clear_rogue_screen = function () { for (let i=0; i<grid.length; i++) { grid[i].fill(32); } } }
-function set_rogue_screen(row,col,ch) { Module.rogue_screen[row][col] = ch; }
+function init_rogue_screen(rows,cols) { Module.init_rogue_screen(rows, cols); }
+function set_rogue_screen(row,col,ch) { Module.setchar(row, col, ch); }
 function clear_rogue_screen() { Module.clear_rogue_screen(); }
 function __asyncjs__do_getchar() { return Asyncify.handleAsync(async () => { Module.print_rogue_screen(); return await Module.getchar(); }); }
 
@@ -5222,7 +5256,7 @@ var _asyncify_stop_unwind = createExportWrapper('asyncify_stop_unwind');
 var _asyncify_start_rewind = createExportWrapper('asyncify_start_rewind');
 var _asyncify_stop_rewind = createExportWrapper('asyncify_stop_rewind');
 var ___start_em_js = Module['___start_em_js'] = 91448;
-var ___stop_em_js = Module['___stop_em_js'] = 92162;
+var ___stop_em_js = Module['___stop_em_js'] = 91733;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
