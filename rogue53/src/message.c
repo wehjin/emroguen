@@ -136,9 +136,7 @@ boolean do_echo;
 #include <emscripten.h>
 EM_ASYNC_JS(int, do_getchar, (), {
 	Module.print_rogue_screen();
-	const readKey = () => new Promise(resolve => window.addEventListener('keypress', resolve, { once: true }));
-	const x = await readKey();
-	return x.which;
+	return await Module.getchar(); 
 });
 
 rgetchar()

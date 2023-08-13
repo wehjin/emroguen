@@ -204,10 +204,13 @@ Module['FS_createPath']("/usr", "games", true, true);
   Module.char_codes = new Array();
 Module.resolve_ch = null;;
 Module.new_message = function (ch) {
+	if (typeof ch != "number") {
+		ch = ch.charCodeAt(0);
+	}
 	let m = new MessageEvent("message", {
 		data: {
 			"type": "input",
-			"ch": ch.charCodeAt(0),
+			"ch": ch,
 		}
 	});
 	return m;
@@ -216,9 +219,7 @@ Module.handle_message = function(e) {
 	let ch = e.data.ch;
 	if (this.resolve_ch === null) {
 		this.char_codes.push(ch);
-		console.log("add char to queue", ch);
 	} else {
-		console.log("resolve char from message", ch);
 		let resolve = this.resolve_ch;
 		this.resolve_ch = null;
 		resolve(ch);
@@ -228,14 +229,35 @@ Module.getchar = async function() {
         const readCh = () => new Promise(resolve => {
 		let ch = this.char_codes.shift();
 		if (ch !== undefined) {
-			console.log("resolve char from queue", ch);
 			resolve(ch);
 		} else {
-			console.log("send resolve to module");
 			this.resolve_ch = resolve;
 		}
 	});
         return await readCh();
+}
+
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+	console.log('todo: add message listener');
+} else {
+	console.log('add keypress listener');
+	window.addEventListener('keypress', (event) => {
+		let ascii, key = event.key;
+		console.log('got key', key);
+		if(key.length == 1) {
+			ascii = key.charCodeAt(0);
+			if(ascii < 128 && event.ctrlKey) {
+				ascii = ascii & 0x1f;
+			}
+		}
+		if( typeof ascii == "number" && ascii < 128) {
+			console.log(`ASCII code ${ascii} entered from keyboard`);
+			const message = Module.new_message(ascii);
+			Module.handle_message(message);
+		} else {
+			console.log( key + " is not in the ASCII character set");
+		}
+	});
 }
 /**
  * @license
@@ -1248,7 +1270,7 @@ function dbg(text) {
 function init_rogue_screen(rows,cols) { let grid = new Array(rows); for (let i=0; i< grid.length; i++) { grid[i] = new Array(cols).fill(32); } Module.rogue_screen = grid; Module.print_rogue_screen = function () { let grid_strings = new Array(grid.length); for (let i=0; i<grid.length; i++) { let row = String.fromCharCode(...grid[i]); grid_strings[i] = row; } console.log(grid_strings.join('\n')); }; Module.clear_rogue_screen = function () { for (let i=0; i<grid.length; i++) { grid[i].fill(32); } } }
 function set_rogue_screen(row,col,ch) { Module.rogue_screen[row][col] = ch; }
 function clear_rogue_screen() { Module.clear_rogue_screen(); }
-function __asyncjs__do_getchar() { return Asyncify.handleAsync(async () => { Module.print_rogue_screen(); const readKey = () => new Promise(resolve => window.addEventListener('keypress', resolve, { once: true })); const x = await readKey(); return x.which; }); }
+function __asyncjs__do_getchar() { return Asyncify.handleAsync(async () => { Module.print_rogue_screen(); return await Module.getchar(); }); }
 
 
 // end include: preamble.js
@@ -5200,7 +5222,7 @@ var _asyncify_stop_unwind = createExportWrapper('asyncify_stop_unwind');
 var _asyncify_start_rewind = createExportWrapper('asyncify_start_rewind');
 var _asyncify_stop_rewind = createExportWrapper('asyncify_stop_rewind');
 var ___start_em_js = Module['___start_em_js'] = 91448;
-var ___stop_em_js = Module['___stop_em_js'] = 92282;
+var ___stop_em_js = Module['___stop_em_js'] = 92162;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===
