@@ -6,6 +6,7 @@ SRC	:= $(wildcard $(SRC_DIR)/*.c)
 OBJ	:= $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 JS	:= $(DIST_DIR)/output.js
 HTML	:= $(DIST_DIR)/output.html
+PRE_JS	:= $(SRC_DIR)/setup.js
 
 CC = emcc -g
 
@@ -19,6 +20,7 @@ CFLAGS	:= \
 
 LDFLAGS := \
 	--emrun\
+	--pre-js $(PRE_JS)\
 	--preload-file assets/etc/termcap@/etc/termcap\
 	--preload-file assets/usr/games@/usr/games
 
@@ -32,11 +34,11 @@ all: $(HTML)
 .PHONY: js
 js: $(JS)
 
-$(HTML): $(OBJ) | $(DIST_DIR)
-	$(CC) $(LDFLAGS) $(OPTIONS) $^ -o $@
+$(HTML): $(OBJ) $(PRE_JS) | $(DIST_DIR)
+	$(CC) $(LDFLAGS) $(OPTIONS) $(OBJ) -o $@
 
-$(JS): $(OBJ) | $(DIST_DIR)
-	$(CC) $(LDFLAGS) $(OPTIONS) $^ -o $@
+$(JS): $(OBJ) $(PRE_JS) | $(DIST_DIR) 
+	$(CC) $(LDFLAGS) $(OPTIONS) $(OBJ) -o $@ 
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) $(OPTIONS) -c $< -o $@
