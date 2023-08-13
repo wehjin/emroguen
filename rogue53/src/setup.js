@@ -9,15 +9,6 @@ Module.init_rogue_screen = function (rows, cols) {
 	}
 	this.rogue_screen = grid;
 };
-Module.print_rogue_screen = function () {
-	const grid = this.rogue_screen;
-	let grid_strings = new Array(grid.length);
-	for (let i=0; i<grid.length; i++) {
-		let row = String.fromCharCode(...grid[i]);
-		grid_strings[i] = row;
-	}
-	console.log(grid_strings.join('\n'));
-};
 Module.clear_rogue_screen = function () {
 	const grid = this.rogue_screen;
 	for (let i=0; i<grid.length; i++) {
@@ -27,6 +18,16 @@ Module.clear_rogue_screen = function () {
 Module.setchar = function (row, col, ch) {
 	const grid = this.rogue_screen;
 	grid[row][col] = ch;
+};
+Module.print_rogue_screen = function () {
+	const grid = this.rogue_screen;
+	let grid_strings = new Array(grid.length);
+	for (let i=0; i<grid.length; i++) {
+		let row = String.fromCharCode(...grid[i]);
+		grid_strings[i] = row;
+	}
+	const dungeon = grid_strings.join('\n');
+	this.post_rogue_screen(dungeon);
 };
 
 /*
@@ -69,8 +70,13 @@ Module.getchar = async function() {
 }
 
 if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+	console.log('todo: post to channel');
 	console.log('todo: add message listener');
 } else {
+	console.log('post to console');
+	Module.post_rogue_screen = function (dungeon) {
+		console.log(dungeon);
+	};
 	console.log('add keypress listener');
 	window.addEventListener('keypress', (event) => {
 		let ascii, key = event.key;
