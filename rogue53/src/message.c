@@ -292,8 +292,14 @@ save_screen()
 
 sound_bell()
 {
+#ifdef EMSCRIPTEN
+	EM_ASM(
+		Module.beep();
+	);
+#else
 	putchar(7);
 	fflush(stdout);
+#endif
 }
 
 boolean
