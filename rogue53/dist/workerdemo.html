@@ -57,6 +57,8 @@
 			if(ascii < 128 && event.ctrlKey) {
 				ascii = ascii & 0x1f;
 			}
+		} else if (key === "Enter") {
+			ascii = '\n'.charCodeAt(0);
 		}
 		if( typeof ascii == "number" && ascii < 128) {
 			console.log(`ASCII code ${ascii} entered from keyboard`);
