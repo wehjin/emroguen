@@ -241,7 +241,7 @@ Module.print_rogue_screen = function () {
  */
 Module.char_codes = new Array();
 Module.resolve_ch = null;;
-Module.new_message = function (ch) {
+Module.new_message_event = function (ch) {
 	if (typeof ch != "number") {
 		ch = ch.charCodeAt(0);
 	}
@@ -253,7 +253,7 @@ Module.new_message = function (ch) {
 	});
 	return m;
 };
-Module.handle_message = function(e) {
+Module.handle_event = function(e) {
 	let ch = e.data.ch;
 	if (this.resolve_ch === null) {
 		this.char_codes.push(ch);
@@ -276,9 +276,27 @@ Module.getchar = async function() {
 }
 
 if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-	console.log('todo: post to channel');
-	console.log('todo: add message listener');
+/*
+ * worker events
+ */
+	console.log('post to channel');
+	Module.post_rogue_screen = function (message_data) {
+		postMessage(message_data);
+	};
+	console.log('add message listener');
+	addEventListener("message", (e) => {
+		console.log("Message from main script:", e.data);
+		Module.handle_event(e);
+	});
+	console.log('todo: add beep message');
+	Module.beep = function () {
+		const message_data = { "type" : "beep"	};
+		postMessage(message_data);
+	};
 } else {
+/*
+ * standalone events
+ */
 	console.log('post to console');
 	Module.post_rogue_screen = function (message) {
 		switch (message.type) {
@@ -299,8 +317,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScop
 		}
 		if( typeof ascii == "number" && ascii < 128) {
 			console.log(`ASCII code ${ascii} entered from keyboard`);
-			const message = Module.new_message(ascii);
-			Module.handle_message(message);
+			const event = Module.new_message_event(ascii);
+			Module.handle_event(event);
 		} else {
 			console.log( key + " is not in the ASCII character set");
 		}

@@ -34,6 +34,13 @@ all: $(HTML)
 .PHONY: js
 js: $(JS)
 
+$(DIST_DIR)/workerdemo.html: $(SRC_DIR)/workerdemo.html
+	cp $< $@
+
+.PHONY: work 
+work: js $(DIST_DIR)/workerdemo.html
+	emrun --no_browser $(DIST_DIR)/workerdemo.html
+
 $(HTML): $(OBJ) $(PRE_JS) | $(DIST_DIR)
 	$(CC) $(LDFLAGS) $(OPTIONS) $(OBJ) -o $@
 
