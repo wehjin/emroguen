@@ -1339,7 +1339,7 @@ function dbg(text) {
 // === Body ===
 
 var ASM_CONSTS = {
-  91733: () => { Module.beep(); }
+  91565: () => { Module.beep(); }
 };
 function init_rogue_screen(rows,cols) { Module.init_rogue_screen(rows, cols); }
 function set_rogue_screen(row,col,ch) { Module.setchar(row, col, ch); }
@@ -5331,8 +5331,8 @@ var _asyncify_start_unwind = createExportWrapper('asyncify_start_unwind');
 var _asyncify_stop_unwind = createExportWrapper('asyncify_stop_unwind');
 var _asyncify_start_rewind = createExportWrapper('asyncify_start_rewind');
 var _asyncify_stop_rewind = createExportWrapper('asyncify_stop_rewind');
-var ___start_em_js = Module['___start_em_js'] = 91448;
-var ___stop_em_js = Module['___stop_em_js'] = 91733;
+var ___start_em_js = Module['___start_em_js'] = 91280;
+var ___stop_em_js = Module['___stop_em_js'] = 91565;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===

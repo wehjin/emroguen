@@ -165,7 +165,9 @@ short other;
 	long s;
 	boolean failed = 0;
 	char *mode = "r+w";
+#ifndef EMSCRIPTEN
 	turn_into_games();
+#endif
 	while ((fp = fopen(score_file, mode)) == NULL) {
 		if (!failed) {
 			mode = "w";
@@ -175,7 +177,9 @@ short other;
 		}
 		failed = 1;
 	}
+#ifndef EMSCRIPTEN
 	turn_into_user();
+#endif
 	(void) xxx(1);
 
 	for (i = 0; i < 10; i++) {

@@ -360,13 +360,14 @@ char *fname;
 char *
 md_gln()
 {
+#ifdef EMSCRIPTEN
 	return "emscripten";
-/*
+#else
 	struct passwd *p=getpwuid(getuid());
 	if(p)
 		return p->pw_name;
 	return NULL;
-*/
+#endif
 }
 
 /* md_sleep:

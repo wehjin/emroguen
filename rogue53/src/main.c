@@ -19,20 +19,28 @@ int true_uid= -1;
 
 void turn_into_games()
 {
+#ifdef EMSCRIPTEN
+	return;
+#else
 	if(setuid(saved_uid)==-1)
 	{
 		perror("setuid(restore)");
 		clean_up("");
 	}
+#endif
 }
 
 void turn_into_user()
 {
+#ifdef EMSCRIPTEN
+	return;
+#else
 	if(setuid(true_uid)==-1)
 	{
 		perror("setuid(restore)");
 		clean_up("");
 	}
+#endif
 }
 
 main(argc, argv)
@@ -40,8 +48,10 @@ int argc;
 char *argv[];
 {
 	/* Save the setuid we have got, then turn back into the player */
+#ifndef EMSCRIPTEN
 	saved_uid=geteuid();
 	setuid(true_uid=getuid());
+#endif
 
 	if (init(argc, argv)) {		/* restored game */
 		goto PL;
